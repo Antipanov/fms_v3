@@ -2,7 +2,6 @@ from flask import Flask
 from .extensions import db, migrate
 from .routes.routes import home, competitions
 
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'vnkdjnfjknfl1232#'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///fights.db'
@@ -12,8 +11,7 @@ migrate.init_app(app, db)
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 app.register_blueprint(home)
 app.register_blueprint(competitions)
-# db.create_all()
-
+# competitions.competition_create_new = 'competitions.competition_create_new'
 
 if __name__ == "__main__":
     app.run()
