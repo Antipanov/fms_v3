@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, flash
 from ..extensions import db
 from ..models.models import CompetitionsDB
 from ..forms import CompetitionForm
-from sqlalchemy import desc
+from sqlalchemy import desc, asc
 
 home = Blueprint('home', __name__, template_folder='templates')
 
@@ -18,7 +18,7 @@ competitions = Blueprint('competitions', __name__, template_folder='templates')
 
 @competitions.route('/competitions')
 def competitions_view():
-    competitions_data = CompetitionsDB.query.all()
+    competitions_data = CompetitionsDB.query.order_by(asc(CompetitionsDB.competition_date_start)).all()
     return render_template('competitions.html', competitions_data=competitions_data)
 
 
@@ -27,6 +27,7 @@ def competitions_view():
 def competition_create_new():
     form = CompetitionForm()
     return render_template('newcompetition.html', form=form)
+
 
 # Действие по кнопке создания нового соревнования
 @competitions.route('/competitions/created_new', methods=["POST", "GET"])
@@ -43,10 +44,18 @@ def form_action_competition_create_new():
             db.session.commit()
             created_competition_data = CompetitionsDB.query.order_by(desc(CompetitionsDB.competition_id)).first()
             flash('Изменения сохранены')
-            return render_template('competition.html', form=form, competition_data=created_competition_data, flash=flash)
+            return render_template('competition.html', form=form, competition_data=created_competition_data)
 
         except Exception as e:
             print(e)
             db.session.rollback()
             return render_template('newcompetition.html')
 
+
+# Карточка соревнования
+# competition view
+@competitions.route('/competitions/<int:competition_id>')
+def competition_view(competition_id):
+    competition_data = CompetitionsDB.query.get(competition_id)
+
+    return render_template('competition.html', competition_data=competition_data)
