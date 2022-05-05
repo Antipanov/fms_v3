@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, flash
+from flask import Blueprint, render_template, flash, request, jsonify, redirect, url_for
 from ..extensions import db
 from ..models.models import CompetitionsDB
 from ..forms import CompetitionForm
@@ -59,3 +59,34 @@ def competition_view(competition_id):
     competition_data = CompetitionsDB.query.get(competition_id)
 
     return render_template('competition.html', competition_data=competition_data)
+
+
+@competitions.route('/ajaxfile', methods=["POST", "GET"])
+def ajaxfile():
+
+    if request.method == 'POST':
+        competition_id = request.form['competition_id']
+        form = CompetitionForm()
+        competition_data = CompetitionsDB.query.filter_by(competition_id=competition_id).all()
+    return jsonify({'htmlresponse': render_template('response.html', competition_data=competition_data, form=form)})
+
+
+# competition view
+@competitions.route('/competitions/edit/<int:competition_id>', methods=["POST", "GET"])
+def competition_edit_view(competition_id):
+    competition_data = CompetitionsDB.query.get(competition_id)
+    competitions_data = CompetitionsDB.query.order_by(asc(CompetitionsDB.competition_date_start)).all()
+    form = CompetitionForm()
+    if form.validate_on_submit():
+        competition_data.competition_name = form.competition_name_form.data
+        competition_data.competition_date_start = form.competition_date_start.data
+        competition_data.competition_date_finish = form.competition_date_finish.data
+        competition_data.competition_city = form.competition_city.data
+        try:
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+
+        return redirect(url_for('competitions.competitions_view'))
+    return render_template('competitions.html', competitions_data=competitions_data)
