@@ -78,6 +78,7 @@ def competition_edit_view(competition_id):
     competitions_data = CompetitionsDB.query.order_by(asc(CompetitionsDB.competition_date_start)).all()
     form = CompetitionForm()
     if form.validate_on_submit():
+        flash('Изменения сохранены')
         competition_data.competition_name = form.competition_name_form.data
         competition_data.competition_date_start = form.competition_date_start.data
         competition_data.competition_date_finish = form.competition_date_finish.data
