@@ -7,8 +7,12 @@
 {% block head %}
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap4.min.css">
-<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+{#<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet">#}
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 {% endblock %}
+
 
 {% block content %}
 <div class="container" style="margin-top: 10px">
@@ -51,7 +55,13 @@
                 {% endif %}
 
                 <td>{{ competition_row.competition_city}}</td>
-                <td><button data-id='{{competition_row.competition_id}}' class="userinfo btn-sm btn-success">edit</button></td>
+                <td>
+                    <button data-id='{{competition_row.competition_id}}' class="userinfo btn-sm btn-success"><i class="fa fa-edit"></i></button>
+
+                <button button data-id='{{competition_row.competition_id}}' class="btn btn-sm btn-danger"><i class="fa fa-edit"></i></button>
+
+                </td>
+
             </tr>
         {% endfor %}
     </table>
