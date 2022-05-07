@@ -129,8 +129,8 @@
             {
         "order": [[ 1, "desc" ]],
         {#"pagingType": "full_numbers",#}
-        language: {
-            url: 'dataTables.russian.json'
+        "language": {
+            "url": "{{ url_for('static', filename='ru.json') }}"
         }
 
     });
