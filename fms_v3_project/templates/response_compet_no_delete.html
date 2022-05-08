@@ -1,0 +1,11 @@
+{% for row in competition_data %}
+    <p>У соревнования "{{ row.competition_name }}" есть связанные регистрации участников.</p>
+
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+
+    </div>
+
+
+{% endfor %}

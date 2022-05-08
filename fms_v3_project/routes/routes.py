@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, flash, request, jsonify, redirect, url_for
 from ..extensions import db
-from ..models.models import CompetitionsDB
+from ..models.models import CompetitionsDB, RegistrationDB
 from ..forms import CompetitionForm
 from sqlalchemy import desc, asc
 
@@ -18,7 +18,7 @@ competitions = Blueprint('competitions', __name__, template_folder='templates')
 
 @competitions.route('/competitions')
 def competitions_view():
-    competitions_data = CompetitionsDB.query.order_by(asc(CompetitionsDB.competition_date_start)).all()
+    competitions_data = CompetitionsDB.query.filter_by(delete_status=False).order_by(asc(CompetitionsDB.competition_date_start)).all()
     return render_template('competitions.html', competitions_data=competitions_data)
 
 
@@ -57,18 +57,34 @@ def form_action_competition_create_new():
 @competitions.route('/competitions/<int:competition_id>')
 def competition_view(competition_id):
     competition_data = CompetitionsDB.query.get(competition_id)
+    competitions_data = db.session.query(CompetitionsDB.competition_id).filter_by(delete_status = False).all()
+    competition_id_list = [value for value, in competitions_data]
+    if competition_id in competition_id_list:
+        return render_template('competition.html', competition_data=competition_data)
+    else:
+        return redirect(url_for('competitions.competitions_view'))
 
-    return render_template('competition.html', competition_data=competition_data)
 
-
+# генерация отображения содержимого модала удаления соревнования
+@competitions.route('/ajaxfile_delete_comp', methods=["POST", "GET"])
+def ajaxfile_delete_competition_func():
+    if request.method == 'POST':
+        competition_id = request.form['competition_id']
+        competition_data = CompetitionsDB.query.filter_by(competition_id=competition_id, delete_status=False).all()
+        comp_regs_data = RegistrationDB.query.filter_by(competition_id=competition_id).all()
+        number_of_registrations = len(comp_regs_data)
+        if number_of_registrations==0:
+            return jsonify({'htmlresponse': render_template('response_compet_delete.html', competition_data=competition_data)})
+        else:
+            return jsonify({'htmlresponse': render_template('response_compet_no_delete.html', competition_data=competition_data)})
+# генерация отображения формы редактирования соревнования
 @competitions.route('/ajaxfile', methods=["POST", "GET"])
 def ajaxfile():
-
     if request.method == 'POST':
         competition_id = request.form['competition_id']
         form = CompetitionForm()
         competition_data = CompetitionsDB.query.filter_by(competition_id=competition_id).all()
-    return jsonify({'htmlresponse': render_template('response.html', competition_data=competition_data, form=form)})
+        return jsonify({'htmlresponse': render_template('response.html', competition_data=competition_data, form=form)})
 
 
 # competition view
@@ -91,3 +107,17 @@ def competition_edit_view(competition_id):
 
         return redirect(url_for('competitions.competitions_view'))
     return render_template('competitions.html', competitions_data=competitions_data)
+
+# удаление соревнования
+@competitions.route('/competitions/delete/<int:competition_id>')
+def competition_delete_view(competition_id):
+    competition_data = CompetitionsDB.query.get(competition_id)
+    print(type(competition_data))
+    competition_data.delete_status = True
+    try:
+        db.session.commit()
+        flash('Изменения сохранены')
+    except Exception as e:
+        print("ошибка при сохранении изменений в БД: ", e)
+        db.session.rollback()
+    return redirect(url_for('competitions.competitions_view'))

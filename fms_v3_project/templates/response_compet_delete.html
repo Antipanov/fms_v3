@@ -1,0 +1,11 @@
+{% for row in competition_data %}
+    <p>Удалить соревнование "{{ row.competition_name }}"?</p>
+
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Отменить</button>
+        <a href="{{url_for( 'competitions.competition_delete_view', competition_id = row.competition_id)}}"><button type="button" class="btn btn-danger">Удалить</button></a>
+    </div>
+
+
+{% endfor %}
