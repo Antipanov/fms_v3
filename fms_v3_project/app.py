@@ -1,6 +1,6 @@
 from flask import Flask
 from .extensions import db, migrate
-from .routes.routes import home, competitions
+from .routes.routes import home, competitions, fighters
 
 
 
@@ -15,6 +15,7 @@ migrate.init_app(app, db, render_as_batch=True)
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 app.register_blueprint(home)
 app.register_blueprint(competitions)
+app.register_blueprint(fighters)
 # competitions.competition_create_new = 'competitions.competition_create_new'
 
 if __name__ == "__main__":

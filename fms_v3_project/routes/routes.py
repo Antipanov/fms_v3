@@ -12,9 +12,11 @@ def home_view():
     return "homepage"
 
 
-# Список соревнований
+# Blueprint соревнований
 competitions = Blueprint('competitions', __name__, template_folder='templates')
 
+# Blueprint бойцов в системе
+fighters = Blueprint('fighters', __name__, template_folder='templates')
 
 @competitions.route('/competitions')
 def competitions_view():
@@ -122,6 +124,8 @@ def competition_delete_view(competition_id):
         db.session.rollback()
     return redirect(url_for('competitions.competitions_view'))
 
+
+# заполнение данных бойцов
 import csv
 from datetime import date
 @home.route('/fill_fighters')
@@ -137,3 +141,9 @@ def fill_fighters():
                 print("Не получилось импортировать бойцов. Ошибка: ", e)
                 db.session.rollback()
     return "Бойцы импортированы в базу"
+
+# участники - бойцы, зарегистрированные в системе
+@app.route('/participants')
+def participants():
+    participants = FightersDB.query.all()
+    return render_template('participants.html', participants = participants)
