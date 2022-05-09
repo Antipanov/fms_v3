@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, flash, request, jsonify, redirect, url_for
 from ..extensions import db
-from ..models.models import CompetitionsDB, RegistrationDB
+from ..models.models import CompetitionsDB, RegistrationDB, FightersDB
 from ..forms import CompetitionForm
 from sqlalchemy import desc, asc
 
@@ -121,3 +121,19 @@ def competition_delete_view(competition_id):
         print("ошибка при сохранении изменений в БД: ", e)
         db.session.rollback()
     return redirect(url_for('competitions.competitions_view'))
+
+import csv
+from datetime import date
+@home.route('/fill_fighters')
+def fill_fighters():
+    with open('fighters.csv', encoding='utf8') as csvfile:
+        fighters_csv_list = csv.reader(csvfile)
+        for row in fighters_csv_list:
+            new_fighter = FightersDB(active_status=True, first_name = row[0], last_name=row[1], fighter_image_id = row[2], birthday=date(int(row[3]),int(row[4]),int(row[5])))
+            db.session.add(new_fighter)
+            try:
+                db.session.commit()
+            except Exception as e:
+                print("Не получилось импортировать бойцов. Ошибка: ", e)
+                db.session.rollback()
+    return "Бойцы импортированы в базу"

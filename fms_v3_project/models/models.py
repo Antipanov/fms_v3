@@ -1,6 +1,7 @@
 from ..extensions import db
 from datetime import datetime, date
 
+
 """Модель для соревнований"""
 class CompetitionsDB(db.Model):
     competition_id = db.Column(db.Integer, primary_key=True)
@@ -16,8 +17,18 @@ class CompetitionsDB(db.Model):
 class RegistrationDB(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     competition_id = db.Column(db.Integer, db.ForeignKey('competitionsDB.competition_id'))
-    # fighter_id = db.Column(db.Integer, db.ForeignKey('fightersDB.fighter_id'))
+    fighter_id = db.Column(db.Integer, db.ForeignKey('fightersDB.fighter_id'))
     fighter_registration_weight = db.Column(db.Integer)
     fighter_registration_age = db.Column(db.Integer)
     # weight_cat_id = db.Column(db.Integer, db.ForeignKey('weightcategoriesDB.weight_cat_id'))
     # age_cat_id = db.Column(db.Integer, db.ForeignKey('agecategoriesDB.id'))
+
+"""Модель для бойцов"""
+class FightersDB(db.Model):
+    fighter_id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String)
+    last_name = db.Column(db.String)
+    fighter_image_id = db.Column(db.String)
+    birthday = db.Column(db.Date, default=datetime.utcnow)
+    active_status = db.Column(db.Boolean, default=True)
+    registrations = db.relationship('RegistrationDB', backref = 'fighter')
