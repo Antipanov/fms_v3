@@ -54,6 +54,7 @@
 <script>
     $(document).ready(function() {
         $('#fighters_table').DataTable({
+            stateSave: true,
             "language": {
             "url": "{{ url_for('static', filename='ru.json') }}"
         }
