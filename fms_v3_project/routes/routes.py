@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, flash, request, jsonify, redirect, url_for
 from ..extensions import db
 from ..models.models import CompetitionsDB, RegistrationDB, FightersDB
-from ..forms import CompetitionForm
+from ..forms import CompetitionForm, FighterForm
 from sqlalchemy import desc, asc
 
 home = Blueprint('home', __name__, template_folder='templates')
@@ -158,3 +158,23 @@ def fill_fighters():
 def fighters_view():
     fighters_data = FightersDB.query.all()
     return render_template('fighters.html', fighters_data=fighters_data)
+
+# карточка редактирования бойца
+@fighters.route('/fighter_edit/<int:fighter_id>', methods=["POST", "GET"])
+def fighter_edit_view(fighter_id):
+    fighter_data = FightersDB.query.get(fighter_id)
+    form = FighterForm()
+    if form.validate_on_submit():
+        flash('Изменения сохранены')
+        fighter_data.name = form.fighter_name_form.data
+        fighter_data.last_name = form.fighter_last_name_form.data
+        fighter_data.birthday = form.birthday_form.data
+        fighter_data.fighter_image_id = form.avatar_google_code.data
+        fighter_data.fighter_image = "https://drive.google.com/uc?id=" + fighter_data.fighter_image_id
+        try:
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+        return render_template('fighter_edit.html', fighter_data = fighter_data, form=form)
+    return render_template('fighter_edit.html', fighter_data = fighter_data, form=form)

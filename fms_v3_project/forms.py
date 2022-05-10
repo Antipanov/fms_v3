@@ -31,9 +31,9 @@ class AgeCategoriesForm(FlaskForm):
     submit = SubmitField('Сохранить')
 
 
-class ParticipantForm(FlaskForm):
-    participant_name_form = StringField('Имя', validators=[validators.DataRequired()])
-    participant_last_name_form = StringField('Фамилия', validators=[validators.DataRequired()])
+class FighterForm(FlaskForm):
+    fighter_name_form = StringField('Имя', validators=[validators.DataRequired()])
+    fighter_last_name_form = StringField('Фамилия', validators=[validators.DataRequired()])
     birthday_form = DateField('Дата рождения', format = '%Y-%m-%d',validators=[validators.DataRequired()])
     avatar_google_code = StringField('Код google для аватарки')
     submit = SubmitField('Сохранить')
