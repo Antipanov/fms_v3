@@ -9,7 +9,7 @@ home = Blueprint('home', __name__, template_folder='templates')
 
 @home.route('/')
 def home_view():
-    return "homepage"
+    return render_template("welcome_page.html")
 
 
 # Blueprint соревнований
@@ -18,9 +18,11 @@ competitions = Blueprint('competitions', __name__, template_folder='templates')
 # Blueprint бойцов в системе
 fighters = Blueprint('fighters', __name__, template_folder='templates')
 
+
 @competitions.route('/competitions')
 def competitions_view():
-    competitions_data = CompetitionsDB.query.filter_by(delete_status=False).order_by(asc(CompetitionsDB.competition_date_start)).all()
+    competitions_data = CompetitionsDB.query.filter_by(delete_status=False).order_by(
+        asc(CompetitionsDB.competition_date_start)).all()
     return render_template('competitions.html', competitions_data=competitions_data)
 
 
@@ -59,7 +61,7 @@ def form_action_competition_create_new():
 @competitions.route('/competitions/<int:competition_id>')
 def competition_view(competition_id):
     competition_data = CompetitionsDB.query.get(competition_id)
-    competitions_data = db.session.query(CompetitionsDB.competition_id).filter_by(delete_status = False).all()
+    competitions_data = db.session.query(CompetitionsDB.competition_id).filter_by(delete_status=False).all()
     competition_id_list = [value for value, in competitions_data]
     if competition_id in competition_id_list:
         return render_template('competition.html', competition_data=competition_data)
@@ -75,10 +77,14 @@ def ajaxfile_delete_competition_func():
         competition_data = CompetitionsDB.query.filter_by(competition_id=competition_id, delete_status=False).all()
         comp_regs_data = RegistrationDB.query.filter_by(competition_id=competition_id).all()
         number_of_registrations = len(comp_regs_data)
-        if number_of_registrations==0:
-            return jsonify({'htmlresponse': render_template('response_compet_delete.html', competition_data=competition_data)})
+        if number_of_registrations == 0:
+            return jsonify(
+                {'htmlresponse': render_template('response_compet_delete.html', competition_data=competition_data)})
         else:
-            return jsonify({'htmlresponse': render_template('response_compet_no_delete.html', competition_data=competition_data)})
+            return jsonify(
+                {'htmlresponse': render_template('response_compet_no_delete.html', competition_data=competition_data)})
+
+
 # генерация отображения формы редактирования соревнования
 @competitions.route('/ajaxfile', methods=["POST", "GET"])
 def ajaxfile():
@@ -110,6 +116,7 @@ def competition_edit_view(competition_id):
         return redirect(url_for('competitions.competitions_view'))
     return render_template('competitions.html', competitions_data=competitions_data)
 
+
 # удаление соревнования
 @competitions.route('/competitions/delete/<int:competition_id>')
 def competition_delete_view(competition_id):
@@ -128,12 +135,15 @@ def competition_delete_view(competition_id):
 # заполнение данных бойцов
 import csv
 from datetime import date
+
+
 @home.route('/fill_fighters')
 def fill_fighters():
     with open('fighters.csv', encoding='utf8') as csvfile:
         fighters_csv_list = csv.reader(csvfile)
         for row in fighters_csv_list:
-            new_fighter = FightersDB(active_status=True, first_name = row[0], last_name=row[1], fighter_image_id = row[2], birthday=date(int(row[3]),int(row[4]),int(row[5])))
+            new_fighter = FightersDB(active_status=True, first_name=row[0], last_name=row[1], fighter_image_id=row[2],
+                                     birthday=date(int(row[3]), int(row[4]), int(row[5])))
             db.session.add(new_fighter)
             try:
                 db.session.commit()
@@ -142,8 +152,9 @@ def fill_fighters():
                 db.session.rollback()
     return "Бойцы импортированы в базу"
 
-# участники - бойцы, зарегистрированные в системе
-@app.route('/participants')
-def participants():
-    participants = FightersDB.query.all()
-    return render_template('participants.html', participants = participants)
+
+# список бойцов в системе
+@fighters.route('/fighters')
+def fighters_view():
+    fighters_data = FightersDB.query.all()
+    return render_template('fighters.html', fighters_data=fighters_data)

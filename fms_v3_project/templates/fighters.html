@@ -17,7 +17,7 @@
 <h3>Бойцы в системе</h3>
 
 
-<a href="{{url_for('fighter_new')}}"><button type="button" class="btn btn-primary">Создать</button></a>
+{# <a href="{{url_for('fighter_new')}}"><button type="button" class="btn btn-primary">Создать</button></a> #}
 
 <p></p>
 <table id="fighters_table" class="table table-striped table-bordered" style="width:100%">
@@ -29,15 +29,15 @@
             </tr>
         </thead>
         <tbody>
-        {% for participant in participants %}
+        {% for fighter in fighters_data %}
             <tr>
 
                 <td>
-                    <a href="{{url_for('participant_view', participant_id = participant.fighter_id)}}">
-                          {{ participant.first_name }} {{ participant.last_name }}
-                    </a>
+                    {# <a href="{{url_for('participant_view', participant_id = participant.fighter_id)}}"> #}
+                          {{ fighter.first_name }} {{ fighter.last_name }}
+                    {# </a> #}
                 </td>
-                <td>{{ participant.birthday.strftime('%d.%m.%Y') }}</td>
+                <td>{{ fighter.birthday.strftime('%d.%m.%Y') }}</td>
             </tr>
         {% endfor %}
 
@@ -53,7 +53,11 @@
 
 <script>
     $(document).ready(function() {
-        $('#fighters_table').DataTable();
+        $('#fighters_table').DataTable({
+            "language": {
+            "url": "{{ url_for('static', filename='ru.json') }}"
+        }
+        });
 } );
 </script>
 
